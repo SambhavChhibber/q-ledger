@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Q-LEDGER: Quantum Console (Vision Tier)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* --- Q-LEDGER V5.1: VISION TIER AESTHETIC SYSTEM --- */
+:root{
+/* Core Palette */
+--q-dark: #0A0A10;
+--q-blue: #00A9FF;
+--q-text-primary: #F0F4F8;
+--q-text-muted: #8F9BB3;
+--q-success: #17B978;
+--q-danger: #FF6B6B;
+/* Glass Components */
+--glass-bg: rgba(255, 255, 255, 0.04);
+--glass-border: rgba(255, 255, 255, 0.1);
+--glass-blur: 40px;
+--radius: 18px;
+--transition-speed: 0.3s;
+--transition-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* Global Resets & Typography */
+*{box-sizing:border-box;}
+html{scroll-behavior: smooth;}
+body{
+height:100%; margin:0;
+font-family:Inter,system-ui,-apple-system,'Helvetica Neue',Arial;
+color:var(--q-text-primary);
+background-color: var(--q-dark);
+-webkit-font-smoothing:antialiased;
+background-image: radial-gradient(circle at center, rgba(0, 169, 255, 0.05) 0%, transparent 40%);
+background-size: cover;
+background-position: center;
+background-attachment: fixed;
+overflow-y: hidden;
+}
+h1,h2,h3,h4,h5{color:white; letter-spacing: -0.01em;}
+/* Core Glass Effect */
+.glass-effect {
+background: var(--glass-bg);
+backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+border: 1px solid var(--glass-border);
+border-radius: var(--radius);
+transition: all var(--transition-speed) var(--transition-curve);
+box-shadow:
+0 1px 2px rgba(0, 0, 0, 0.2),
+0 10px 30px rgba(0, 0, 0, 0.6),
+inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Blur Overlay for Modal Effect */
+.blur-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.6);
+backdrop-filter: blur(20px) saturate(150%);
+-webkit-backdrop-filter: blur(20px) saturate(150%);
+z-index: 99;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.4s var(--transition-curve);
+}
+
+.blur-overlay.active {
+opacity: 1;
+pointer-events: all;
+}
+/* Interactive Elements */
+.interactive-card:hover {
+transform: translateY(-5px) scale(1.005);
+box-shadow:
+0 15px 40px rgba(0, 0, 0, 0.8),
+0 0 30px var(--q-blue),
+inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+/* BUTTONS */
+.btn{
+padding: 12px 24px;
+border-radius: 10px;
+border: 0;
+cursor: pointer;
+font-weight: 600;
+transition: all var(--transition-speed) var(--transition-curve);
+letter-spacing: 0.2px;
+}
+.btn:active{
+transform: scale(0.95);
+box-shadow: none !important;
+}
+.btn.primary{
+background: var(--q-blue);
+color: var(--q-dark);
+box-shadow: 0 5px 20px rgba(0, 169, 255, 0.7);
+font-weight: 700;
+}
+.btn.primary:hover{
+background: #00C1FF;
+transform: translateY(-2px);
+}
+.btn.ghost{
+background: rgba(255,255,255,0.08);
+color: var(--q-text-primary);
+border: 1px solid var(--glass-border);
+}
+.btn.ghost:hover{
+background: rgba(255,255,255,0.15);
+transform: translateY(-1px);
+}
+/* FORMS */
+input, select {
+background: rgba(0, 0, 0, 0.3);
+border: 1px solid rgba(255, 255, 255, 0.15);
+padding: 14px;
+border-radius: 12px;
+color: var(--q-text-primary);
+width: 100%;
+margin-top: 8px;
+font-size: 16px;
+transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus {
+outline: none;
+border-color: var(--q-blue);
+background: rgba(0, 0, 0, 0.5);
+box-shadow: 0 0 15px rgba(0, 169, 255, 0.4);
+transform: scale(1.001);
+}
+.small-muted{font-size:14px; color:var(--q-text-muted);}
+/* Layout */
+.site{min-height:100vh;display:flex;flex-direction:column;}
+header.site-header{
+position:sticky;top:0;z-index:40;padding:16px 40px;
+background:rgba(10,10,16,0.9);
+backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+border-bottom:1px solid rgba(255,255,255,0.08);
+display:flex;align-items:center;justify-content:space-between;
+}
+.brand h1{margin:0;font-size:26px;letter-spacing:-0.5px;font-weight:900;}
+/* Main Content */
+main{
+overflow-y:auto;
+height:calc(100vh - 80px);
+scroll-snap-type:y mandatory;
+}
+section.panel{
+min-height: 100vh;
+padding: 40px 40px;
+scroll-snap-align: start;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.content-container {
+width: 100%;
+max-width: 1280px;
+margin: 0 auto;
+display: grid;
+gap: 24px;
+}
+.dashboard-grid-2-col {
+grid-template-columns: 1.5fr 1fr;
+gap: 24px;
+}
+/* Stat Cards */
+.overview-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:16px;margin-top:24px}
+.stat{padding:24px; cursor:pointer; position: relative; overflow: hidden;}
+.stat::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: radial-gradient(circle at center, rgba(0, 169, 255, 0.1), transparent);
+opacity: 0;
+transition: opacity 0.3s ease;
+}
+.stat:hover::before {
+opacity: 1;
+}
+.stat.active {
+background: rgba(0, 169, 255, 0.08);
+border-color: var(--q-blue);
+}
+.stat .value{font-weight:900;font-size:36px;margin-top:8px;letter-spacing:-1px;}
+.stat-icon{opacity: 0.6; margin-right: 10px;}
+/* Transaction Rows */
+.txn{
+display:flex;justify-content:space-between;padding:16px 20px;border-radius:12px;margin-bottom:10px;
+background:rgba(255,255,255,0.02);
+align-items:center;transition:all var(--transition-speed) var(--transition-curve);
+border: 1px solid transparent;
+cursor: pointer;
+position: relative;
+overflow: hidden;
+}
+.txn::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(0, 169, 255, 0.1), transparent);
+transform: translateX(-100%);
+transition: transform 0.6s ease;
+}
+.txn:hover::before {
+transform: translateX(100%);
+}
+.txn:hover{
+background:rgba(255,255,255,0.05);
+border-color: rgba(0, 169, 255, 0.3);
+transform: scale(1.005);
+}
+.txn.active {
+background: rgba(0, 169, 255, 0.1);
+border-color: var(--q-blue);
+}
+.tag{padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; min-width:90px; text-align:center;}
+.tag.inflow{background:var(--q-success); color:var(--q-dark); box-shadow:0 1px 8px rgba(23, 185, 120, 0.5);}
+.tag.outflow{background:var(--q-danger); color:var(--q-dark); box-shadow:0 1px 8px rgba(255, 107, 107, 0.5);}
+.txn-amount.inflow{color:var(--q-success);}
+.txn-amount.outflow{color:var(--q-danger);}
+/* AUTH SCREEN */
+#auth-screen {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100;
+display: flex; justify-content: center; align-items: center;
+background: rgba(0, 0, 0, 0.8);
+}
+.auth-console {
+width: 90%; max-width: 420px; padding: 40px; text-align: center;
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(80px);
+border: 1px solid rgba(255,255,255,0.2);
+border-radius: 24px;
+box-shadow: 0 50px 150px rgba(0, 0, 0, 0.9);
+transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.auth-console h2 {
+font-size: 32px; font-weight: 900; margin-bottom: 5px; color: var(--q-blue);
+text-shadow: 0 0 15px rgba(0, 169, 255, 0.4);
+}
+.auth-toggle {
+margin-top: 25px; font-size: 14px; cursor: pointer; color: var(--q-text-muted);
+}
+.auth-toggle:hover {
+color: var(--q-blue);
+}
+/* Modal */
+.modal-card {
+transition: transform var(--transition-speed) var(--transition-curve);
+}
+.modal-card:hover {
+transform: translateY(-5px) scale(1.01);
+}
+/* RESPONSIVENESS */
+@media (max-width:1100px){
+.content-container {max-width: 95%;}
+.dashboard-grid-2-col{grid-template-columns:1fr}
+.overview-grid{grid-template-columns:repeat(1, 1fr);}
+section.panel{padding:30px 20px;}
+header.site-header{padding:16px 20px;}
+.txn-amount{font-size:16px!important;}
+}
+</style>
+</head>
+<body>
+<!-- AUTHENTICATION SCREEN -->
+<div id="auth-screen">
+<div class="auth-console">
+<div id="auth-content">
+<!-- Content loaded by JS -->
+</div>
+</div>
+</div>
+
+<!-- Blur Overlay -->
+<div class="blur-overlay" id="blurOverlay"></div>
+
+<!-- MAIN DASHBOARD -->
+<div id="dashboard-screen" class="site" style="display:none;">
+<header class="site-header">
+<div class="brand">
+<div style="display:flex;gap:12px;align-items:center">
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--q-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+<h1>Q-LEDGER</h1>
+</div>
+<p class="small-muted" style="margin-left:40px;margin-top:5px;font-size:12px;">QUANTUM ACCESS // EXECUTIVE TIER</p>
+</div>
+<div class="top-actions">
+<button class="btn ghost" onclick="logout()">Terminate Session</button>
+<button class="btn primary" onclick="scrollToSection('section-add')">Log New Transfer</button>
+</div>
+</header>
+<main>
+<section class="panel" id="section-hero">
+<div class="content-container dashboard-grid-2-col">
+<div class="glass-effect interactive-card hero-left" style="padding:40px; height: 100%;">
+<h2>Operational Overview: Real-Time Flow.</h2>
+<p class="small-muted">System metrics are validated against the current fiscal cycle. All data integrity checks passed.</p>
+<div class="overview-grid">
+<div class="stat glass-effect interactive-card" style="border-left: 3px solid var(--q-blue);">
+<div class="small-muted" style="display:flex;align-items:center;">
+<span class="stat-icon">💰</span> Net Account Balance
+</div>
+<div class="value" id="heroBalance">₹0</div>
+<div class="small-muted">Total Classified Assets (Available)</div>
+</div>
+<div class="stat glass-effect interactive-card" style="border-left: 3px solid var(--q-success);">
+<div class="small-muted" style="display:flex;align-items:center;">
+<span class="stat-icon">▲</span> Monthly INFLOW
+</div>
+<div class="value" id="heroIncome" style="color:var(--q-success);">₹0</div>
+<div class="small-muted">System deposits / Resource gain</div>
+</div>
+<div class="stat glass-effect interactive-card" style="border-left: 3px solid var(--q-danger);">
+<div class="small-muted" style="display:flex;align-items:center;">
+<span class="stat-icon">▼</span> Monthly OUTFLOW
+</div>
+<div class="value" id="heroExpense" style="color:var(--q-danger);">₹0</div>
+<div class="small-muted">Total expenditure / Asset transfers</div>
+</div>
+</div>
+<div style="margin-top:40px;display:flex;gap:16px">
+<button class="btn primary" onclick="scrollToSection('section-add')">Log Transfer</button>
+<button class="btn ghost" onclick="scrollToSection('section-transactions')">View Classified Ledger</button>
+</div>
+</div>
+<div class="widgets-area" style="display:flex;flex-direction:column;gap:24px;">
+<div class="glass-effect interactive-card" style="padding:28px;">
+<div style="border-bottom:1px solid var(--glass-border);padding-bottom:15px;">
+<h4 style="margin:0">Quick Deployment Templates</h4>
+<p class="small-muted" style="margin-top:5px;">Pre-configured actions for rapid transfer logging.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+<button class="btn ghost" onclick="quickAdd('Standard Resource Deposit',50000,'credit')" style="font-size:14px;padding:10px 16px;">+ Resource INFLOW (Standard)</button>
+<button class="btn ghost" onclick="quickAdd('Secure Asset Relocation',15000,'debit')" style="font-size:14px;padding:10px 16px;">- Asset OUTFLOW (Secure)</button>
+</div>
+</div>
+<div class="glass-effect interactive-card" style="padding:28px; flex-grow: 1;">
+<h4 style="margin:0">Budget Module: Target Limits</h4>
+<div style="margin-top:12px" id="budgetBox2">
+<div class="small-muted">Monthly Outflow Hard Limit</div>
+<div class="value" id="uiBudget2" style="font-size:32px;font-weight:900;color:var(--q-danger);">₹0</div>
+<div class="small-muted" style="margin-top:5px;">Max projected expenditure for the current cycle.</div>
+<div style="margin-top:18px"><button class="btn primary" onclick="openModal('budget')" style="width:100%; padding:14px;">Set Operational Limit</button></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="panel" id="section-transactions">
+<div class="content-container dashboard-grid-2-col">
+<div class="panel-left">
+<div class="glass-effect" style="padding:40px;">
+<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--glass-border);padding-bottom:20px;">
+<div>
+<div class="small-muted">CLASSIFIED LEDGER</div>
+<div style="font-weight:700;font-size:28px;margin-top:5px;" id="txnCount2">0 entries</div>
+</div>
+<div>
+<button class="btn primary" onclick="scrollToSection('section-add')">Log New Transfer</button>
+</div>
+</div>
+<div class="transactions" id="txnList2" role="list" aria-label="Transactions list" style="max-height:60vh; overflow-y:auto; margin-top:20px;"></div>
+</div>
+</div>
+<aside class="widgets">
+<div class="glass-effect interactive-card" style="padding:30px; margin-bottom: 30px;">
+<h4 style="margin:0">Target Fund Allocation (Strategic Goals)</h4>
+<p class="small-muted">Track savings targets for strategic asset deployment.</p>
+<div id="goalsList2" style="margin-top:16px"></div>
+<div style="margin-top:14px"><button class="btn primary" onclick="openModal('goal')" style="width:100%;">Create New Target</button></div>
+</div>
+<div class="glass-effect interactive-card" style="padding:30px;">
+<h4 style="margin:0">Log Management Console</h4>
+<p class="small-muted">Select an entry for manual override or permanent deletion.</p>
+<div style="margin-top:14px; max-height: 25vh; overflow-y:auto;" id="removeList2"></div>
+<div style="margin-top:20px">
+<button class="btn ghost" onclick="exportJSON()" style="width:100%;">Export CLASSIFIED JSON Log</button>
+</div>
+</div>
+</aside>
+</div>
+</section>
+<section class="panel" id="section-add">
+<div class="content-container dashboard-grid-2-col">
+<div class="panel-left">
+<div class="glass-effect interactive-card" style="padding:40px;">
+<h3 style="margin:0">EXECUTE NEW TRANSFER LOG</h3>
+<p class="small-muted" style="margin-top:6px">Ensure accurate classification for system integrity.</p>
+<form id="addForm2" style="margin-top:30px">
+<label class="small-muted">DESCRIPTION (Classification)
+<input id="fDesc2" placeholder="Secure facility maintenance fee" required></label>
+<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
+<div class="small-muted">Predicted Category:</div>
+<div id="categoryPrediction" style="font-weight:700;color:var(--q-blue);font-size:16px;">...</div>
+</div>
+<div class="row" style="margin-top:20px;display:flex;gap:20px;">
+<div style="flex:1"><label class="small-muted">AMOUNT (Magnitude)
+<input id="fAmt2" type="number" placeholder="12500" required></label></div>
+<div style="width:180px"><label class="small-muted">TYPE (Direction)
+<select id="fType2">
+<option value="debit">OUTFLOW (-)</option>
+<option value="credit">INFLOW (+)</option>
+</select></label></div>
+</div>
+<label style="margin-top:20px;display:block;" class="small-muted">DATE (Timestamp)
+<input id="fDate2" type="date"></label>
+<button class="btn primary" type="submit" style="width:100%; margin-top:30px; padding:18px;font-size:18px;">EXECUTE & VALIDATE</button>
+</form>
+</div>
+</div>
+<aside class="widgets">
+<div class="glass-effect interactive-card" style="padding:30px;">
+<h4 style="margin:0">Security Module Analysis</h4>
+<p class="small-muted">Review of recent transfer patterns for anomaly detection.</p>
+<div id="aiBox2" style="margin-top:15px; border-left: 3px solid var(--q-blue); padding-left: 15px;">
+<div class="small-muted">System Recommendation</div>
+<div style="font-weight:700;font-size:18px;margin-top:5px;color:var(--q-success)">HIGH COMPLIANCE RATING</div>
+<p class="small-muted" style="margin-top:5px;">Current transfer logs exhibit typical operational flow. Budget limits are respected.</p>
+</div>
+</div>
+</aside>
+</div>
+</section>
+<section class="panel" id="section-footer" style="min-height:20vh;align-items:flex-start;padding:40px 0;">
+<div style="width:100%;max-width:1000px;margin:0 auto;text-align:center">
+<h3>Q-LEDGER: Operational Integrity Maintained.</h3>
+<p class="small-muted">This console operates on the closed-loop Quantum Ledger system. All session data is encrypted.</p>
+<div style="margin-top:24px;display:flex;gap:16px;justify-content:center">
+<button class="btn primary" onclick="scrollToSection('section-hero')">Return to Access Point</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Modal -->
+<div id="modal" class="modal" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;display:none;place-items:center;">
+<div class="modal-card glass-effect" id="modalCard" style="padding:35px;border-radius:var(--radius);width:90%;max-width:480px;background:rgba(255, 255, 255, 0.08);backdrop-filter:blur(60px);-webkit-backdrop-filter:blur(60px);"></div>
+</div>
+<script>
+/* CORE DATA & CONSTANTS */
+const STORAGE = 'q_ledger_v6_vision';
+const DEFAULT = {
+transactions: [
+{id:1, date: recentDate(0), desc: 'Primary Stipend Deployment', amount: 80000, type:'credit', category:'Income'},
+{id:2, date: recentDate(-5), desc: 'Secure Server Maintenance Fee', amount: 22000, type:'debit', category:'Housing'},
+{id:3, date: recentDate(-10), desc: 'Tactical Hardware Acquisition', amount: 4500, type:'debit', category:'Shopping'},
+],
+budget: 50000,
+goals: [ {id:1,name:'Emergency Protocol Cache',target:250000,saved:35000} ],
+};
+const KEYWORDS = {
+'Travel':['flight','uber','taxi','train','fuel','transport','logistics'],
+'Housing':['rent','emi','mortgage','housing','fee','server','maintenance'],
+'Shopping':['hardware','acquisition','license','software','parts'],
+'Income':['salary','freelance','deposit','stipend','return','deployment'],
+'Food & Dining':['coffee','mess','canteen','dinner','restaurant','meal','groceries'],
+'Miscellaneous':['fee','audit','transfer']
+};
+let state = loadState();
+let isLoggedIn = false;
+let currentAuthMode = 'login';
+
+/* HELPERS */
+function loadState(){ 
+try{ 
+const r = localStorage.getItem(STORAGE);
+if(!r){ 
+localStorage.setItem(STORAGE, JSON.stringify(DEFAULT));
+return JSON.parse(JSON.stringify(DEFAULT));
+}
+return JSON.parse(r);
+}catch(e){ 
+return JSON.parse(JSON.stringify(DEFAULT));
+}
+}
+function saveState(){ localStorage.setItem(STORAGE, JSON.stringify(state)); }
+function uid(){ return Date.now() + Math.floor(Math.random()*99); }
+function recentDate(offset=0){ 
+const d=new Date();
+d.setDate(d.getDate()+offset);
+return d.toISOString().slice(0,10);
+}
+function currency(v){ return '₹' + Number(v).toLocaleString('en-IN'); }
+function scrollToSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+function detectCategory(text){ 
+const t=(text||'').toLowerCase();
+for(const cat in KEYWORDS){ 
+for(const k of KEYWORDS[cat]){
+if(t.includes(k)) return cat;
+}
+}
+return 'Miscellaneous';
+}
+
+/* BLUR OVERLAY CONTROL */
+function showBlurOverlay() {
+document.getElementById('blurOverlay').classList.add('active');
+}
+function hideBlurOverlay() {
+document.getElementById('blurOverlay').classList.remove('active');
+}
+
+/* ACTIVE STATE MANAGEMENT */
+let activeElement = null;
+function setActiveElement(element, type) {
+// Remove previous active states
+document.querySelectorAll('.stat.active, .txn.active').forEach(el => {
+el.classList.remove('active');
+});
+hideBlurOverlay();
+
+// Set new active state
+if (element && element !== activeElement) {
+element.classList.add('active');
+showBlurOverlay();
+activeElement = element;
+} else {
+activeElement = null;
+}
+}
+
+// Click outside to deactivate
+document.addEventListener('click', (e) => {
+if (activeElement && !e.target.closest('.stat') && !e.target.closest('.txn')) {
+setActiveElement(null);
+}
+});
+
+/* AUTHENTICATION LOGIC */
+function renderAuth(){
+const content = document.getElementById('auth-content');
+if (currentAuthMode === 'login') {
+content.innerHTML = `
+<h2>ACCESS CONSOLE LOGIN</h2>
+<p class="small-muted">Enter credentials to breach security perimeter.</p>
+<form id="authForm">
+<label><input type="text" id="authEmail" placeholder="Secure Username (Any Text)" required></label><br>
+<label style="margin-top:20px;display:block;"><input type="password" id="authPass" placeholder="Decryption Key (Any Text)" required></label><br>
+<button class="btn primary" type="submit" style="width:100%; margin-top:30px; padding:16px;">SECURE LOGIN</button>
+</form>
+<div class="auth-toggle" onclick="toggleAuthMode()">New User? Establish Access Profile.</div>
+`;
+} else {
+content.innerHTML = `
+<h2>CREATE ACCESS PROFILE</h2>
+<p class="small-muted">Establish new profile for Q-LEDGER access.</p>
+<form id="authForm">
+<label><input type="text" id="authEmail" placeholder="Desired Username (Any Text)" required></label><br>
+<label style="margin-top:20px;display:block;"><input type="password" id="authPass" placeholder="New Decryption Key (Any Text)" required></label><br>
+<label style="margin-top:20px;display:block;"><input type="password" id="authPassConfirm" placeholder="Confirm Key" required></label><br>
+<button class="btn primary" type="submit" style="width:100%; margin-top:30px; padding:16px;">CREATE PROFILE</button>
+</form>
+<div class="auth-toggle" onclick="toggleAuthMode()">Already Registered? Secure Login.</div>
+`;
+}
+document.getElementById('authForm').addEventListener('submit', handleAuthSubmit);
+}
+
+function toggleAuthMode(){
+currentAuthMode = currentAuthMode === 'login' ? 'signup' : 'login';
+renderAuth();
+}
+
+function handleAuthSubmit(e){
+e.preventDefault();
+const email = document.getElementById('authEmail').value;
+const pass = document.getElementById('authPass').value;
+if(currentAuthMode === 'signup'){
+const passConfirm = document.getElementById('authPassConfirm').value;
+if(pass !== passConfirm){
+return showModal('<h3>Key Mismatch</h3><p class="small-muted">Decryption Keys do not match. Re-enter.</p>', null, 'OK', false);
+}
+}
+isLoggedIn = true;
+document.getElementById('auth-screen').style.display = 'none';
+document.getElementById('dashboard-screen').style.display = 'flex';
+renderAll();
+console.log(`[Q-LEDGER Console]: Authentication Successful for User: ${email}. Loading Dashboard...`);
+}
+
+function logout(){
+console.log('[Q-LEDGER Console]: User initiated session termination.');
+isLoggedIn = false;
+document.getElementById('dashboard-screen').style.display = 'none';
+document.getElementById('auth-screen').style.display = 'flex';
+renderAuth();
+}
+window.logout = logout;
+
+/* TRANSACTIONS AND RENDERING */
+function renderTransactions(){
+const list = document.getElementById('txnList2');
+const remove = document.getElementById('removeList2');
+list.innerHTML='';
+remove.innerHTML='';
+let creditTotal=0, debitTotal=0;
+const txns = state.transactions.slice().sort((a,b)=>b.id-a.id);
+for(const t of txns){
+const isCredit = t.type==='credit';
+const tagLabel = isCredit ? 'INFLOW' : 'OUTFLOW';
+const sign = isCredit ? '+' : '-';
+const finalCategory = t.category || detectCategory(t.desc);
+// Main Ledger View
+const row = document.createElement('div');
+row.className='txn interactive-card';
+row.onclick = (e) => {
+e.stopPropagation();
+setActiveElement(row, 'transaction');
+};
+row.innerHTML = `<div style="display:flex;gap:16px;align-items:center">
+<div class="tag ${isCredit ? 'inflow' : 'outflow'}">${tagLabel}</div>
+<div>
+<div style="font-weight:600">${t.desc}</div>
+<div class="small-muted">${t.date} • ${finalCategory}</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:15px">
+<div class="txn-amount ${isCredit ? 'inflow' : 'outflow'}" style="font-weight:800; font-size:20px;">${sign}${currency(t.amount)}</div>
+</div>`;
+list.appendChild(row);
+// Remove List Widget View
+const r = document.createElement('div');
+r.style.display='flex';
+r.style.justifyContent='space-between';
+r.style.padding='10px 0';
+r.style.borderBottom='1px solid rgba(255,255,255,0.05)';
+r.innerHTML = `<div class="small-muted">${t.desc} (${sign}${currency(t.amount)})</div><div><button class="btn ghost" style="padding:6px 12px; font-size:12px" onclick="confirmDelete(${t.id})">DELETE</button></div>`;
+remove.appendChild(r);
+if(isCredit) creditTotal+=Number(t.amount);
+else debitTotal+=Number(t.amount);
+}
+document.getElementById('txnCount2').textContent = `${state.transactions.length} Classified Entries`;
+document.getElementById('heroBalance').textContent = currency(creditTotal-debitTotal);
+document.getElementById('heroIncome').textContent = currency(creditTotal);
+document.getElementById('heroExpense').textContent = currency(debitTotal);
+// Check Budget Compliance
+const budgetAlert = document.getElementById('aiBox2');
+if (debitTotal > state.budget) {
+budgetAlert.innerHTML = `<div class="small-muted">System Alert</div><div style="font-weight:700;font-size:18px;margin-top:5px;color:var(--q-danger)">BUDGET OVERRUN DETECTED</div><p class="small-muted" style="margin-top:5px;">Current Outflow (${currency(debitTotal)}) exceeds Hard Limit (${currency(state.budget)}). Immediate review required.</p>`;
+budgetAlert.style.borderLeftColor = 'var(--q-danger)';
+} else {
+budgetAlert.innerHTML = `<div class="small-muted">System Recommendation</div><div style="font-weight:700;font-size:18px;margin-top:5px;color:var(--q-success)">HIGH COMPLIANCE RATING</div><p class="small-muted" style="margin-top:5px;">Current transfer logs exhibit typical operational flow. Budget limits are respected.</p>`;
+budgetAlert.style.borderLeftColor = 'var(--q-blue)';
+}
+}
+window.scrollToSection = scrollToSection;
+
+// Category Prediction Listener
+document.getElementById('fDesc2').addEventListener('input', (e) => {
+const desc = e.target.value;
+const prediction = detectCategory(desc);
+document.getElementById('categoryPrediction').textContent = prediction;
+});
+
+document.getElementById('addForm2').addEventListener('submit', e=>{
+e.preventDefault();
+const desc=document.getElementById('fDesc2').value.trim();
+const amt=Number(document.getElementById('fAmt2').value||0);
+const type=document.getElementById('fType2').value;
+const date=document.getElementById('fDate2').value|| recentDate(0);
+if(!desc||!amt) return showModal('<h3>Entry Error</h3><p class="small-muted">Enter description and amount to log entry.</p>', null, 'DISMISS', false);
+const cat = detectCategory(desc);
+state.transactions.push({id:uid(),date,desc,amount:amt,type,category:cat});
+saveState();
+renderAll();
+document.getElementById('addForm2').reset();
+document.getElementById('fDate2').value = recentDate(0);
+document.getElementById('categoryPrediction').textContent = '...';
+scrollToSection('section-transactions');
+console.log(`[Q-LEDGER Console]: Logged New Entry: ${desc} (${type}). Category: ${cat}`);
+});
+
+function confirmDelete(id){
+const t = state.transactions.find(x=>x.id===id);
+if(!t) return;
+showModal(`<h3>PERMANENT DELETE Ledger Entry</h3><p class="small-muted">Permanently **DELETE** "<strong>${t.desc}</strong>" (${currency(t.amount)} - ${t.type==='credit'?'INFLOW':'OUTFLOW'})? This action is irreversible.</p>`, ()=>{
+state.transactions = state.transactions.filter(x=>x.id!==id);
+saveState();
+hideModal();
+renderAll();
+console.warn(`[Q-LEDGER Console]: Entry ID ${id} (Description: ${t.desc}) has been PERMANENTLY DELETED.`);
+}, 'CONFIRM DELETE');
+}
+window.confirmDelete = confirmDelete;
+
+function quickAdd(desc, amt, type){
+const cat = detectCategory(desc);
+state.transactions.push({id:uid(),date:recentDate(0),desc,amount:amt,type,category:cat});
+saveState();
+renderAll();
+scrollToSection('section-transactions');
+console.log(`[Q-LEDGER Console]: Executed Quick Deployment: ${desc} (${type}).`);
+}
+window.quickAdd = quickAdd;
+
+/* BUDGET & GOALS */
+function renderBudgetBox(){
+document.getElementById('uiBudget2').textContent = currency(state.budget || 0);
+}
+
+function renderGoals(){
+const el=document.getElementById('goalsList2');
+el.innerHTML='';
+if (state.goals.length === 0) {
+el.innerHTML = `<div class="small-muted" style="text-align:center; padding:10px;">No targets set.</div>`;
+}
+state.goals.forEach(g=>{
+const pct=Math.min(100,Math.round((g.saved/g.target)*100));
+const r=document.createElement('div');
+r.className='glass-effect';
+r.style.marginBottom='16px';
+r.style.padding = '18px';
+r.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+<div style="font-weight:700;font-size:17px">${g.name}</div>
+<div class="small-muted">${currency(g.saved)} of ${currency(g.target)}</div>
+</div>
+<div style="text-align:right;position:relative;min-width:60px;">
+<svg class="progress-ring" viewBox="0 0 36 36" width="60" height="60">
+<path d="M18 2.0845a15.9155 15.9155 0 1 0 0 31.831" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+<path d="M18 2.0845a15.9155 15.9155 0 1 0 0 31.831" fill="none" stroke="var(--q-success)" stroke-width="3" stroke-dasharray="${pct} ${100-pct}" stroke-linecap="round"/>
+</svg>
+<div class="small-muted" style="position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);font-weight:700;color:white;font-size:13px;">${pct}%</div>
+</div>
+</div>
+<div style="margin-top:16px;display:flex;gap:10px;border-top:1px dashed var(--glass-border);padding-top:16px;">
+<button class="btn ghost" style="padding:8px 12px; font-size:13px; flex:1;" onclick="allocateTo(${g.id},1000)">ALLOCATE + ₹1k</button>
+<button class="btn primary" style="padding:8px 12px; font-size:13px; flex:1;" onclick="allocateTo(${g.id},5000)">ALLOCATE + ₹5k</button>
+</div>`;
+el.appendChild(r);
+});
+}
+
+function allocateTo(id,amount){
+state.goals = state.goals.map(g=> g.id===id? {...g,saved:g.saved+amount}:g);
+saveState();
+renderAll();
+console.log(`[Q-LEDGER Console]: Allocated ${currency(amount)} to Goal ID ${id}.`);
+}
+window.allocateTo = allocateTo;
+
+/* MODAL LOGIC */
+function showModal(content, onConfirm, confirmText='CONFIRM', showCancel=true) {
+const modal = document.getElementById('modal');
+const modalCard = document.getElementById('modalCard');
+showBlurOverlay();
+modalCard.innerHTML = `
+<div class="modal-content">${content}</div>
+<div style="margin-top:25px; display:flex; gap:15px; justify-content:flex-end;">
+${showCancel ? `<button class="btn ghost" onclick="hideModal()">CANCEL</button>` : ''}
+${onConfirm ? `<button class="btn primary" id="modalConfirmBtn">${confirmText}</button>` : ''}
+</div>
+`;
+if (onConfirm) {
+document.getElementById('modalConfirmBtn').onclick = onConfirm;
+}
+modal.style.display = 'grid';
+document.body.style.overflow = 'hidden';
+}
+
+function hideModal(){
+document.getElementById('modal').style.display = 'none';
+document.body.style.overflow = 'auto';
+hideBlurOverlay();
+}
+
+function openModal(type) {
+if (type === 'budget') {
+showModal(`
+<h3>SET OPERATIONAL LIMIT</h3>
+<p class="small-muted">Define the maximum allowed outflow (debit) for the current cycle.</p>
+<form id="budgetForm">
+<label class="small-muted">MONTHLY HARD LIMIT (Amount)
+<input type="number" id="budgetAmount" value="${state.budget}" required>
+</label>
+<button type="submit" class="btn primary" style="width:100%; margin-top:20px;">UPDATE LIMIT</button>
+</form>
+`, null, null, false);
+document.getElementById('budgetForm').addEventListener('submit', handleBudgetSubmit);
+} else if (type === 'goal') {
+showModal(`
+<h3>CREATE NEW TARGET ALLOCATION</h3>
+<p class="small-muted">Set a strategic savings target.</p>
+<form id="goalForm">
+<label class="small-muted">TARGET NAME <input id="goalName" placeholder="Quantum Processor Upgrade Fund" required></label>
+<label style="margin-top:20px;display:block;" class="small-muted">TARGET AMOUNT <input type="number" id="goalTarget" placeholder="500000" required></label>
+<button type="submit" class="btn primary" style="width:100%; margin-top:20px;">DEPLOY TARGET</button>
+</form>
+`, null, null, false);
+document.getElementById('goalForm').addEventListener('submit', handleGoalSubmit);
+}
+}
+window.openModal = openModal;
+
+function handleBudgetSubmit(e) {
+e.preventDefault();
+const newBudget = Number(document.getElementById('budgetAmount').value);
+if (newBudget >= 0) {
+state.budget = newBudget;
+saveState();
+renderAll();
+hideModal();
+console.log(`[Q-LEDGER Console]: Monthly Hard Limit updated to: ${currency(newBudget)}.`);
+}
+}
+
+function handleGoalSubmit(e) {
+e.preventDefault();
+const name = document.getElementById('goalName').value.trim();
+const target = Number(document.getElementById('goalTarget').value);
+if (name && target > 0) {
+state.goals.push({ id: uid(), name, target, saved: 0 });
+saveState();
+renderAll();
+hideModal();
+console.log(`[Q-LEDGER Console]: New Goal Target Deployed: ${name} (${currency(target)}).`);
+}
+}
+
+/* EXPORT */
+function exportJSON() {
+const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+const downloadAnchorNode = document.createElement('a');
+downloadAnchorNode.setAttribute("href", dataStr);
+downloadAnchorNode.setAttribute("download", "q-ledger-classified-log-" + Date.now() + ".json");
+document.body.appendChild(downloadAnchorNode);
+downloadAnchorNode.click();
+downloadAnchorNode.remove();
+showModal('<h3>EXPORT SUCCESSFUL</h3><p class="small-muted">Classified log has been securely downloaded as JSON format. Review external files for log integrity.</p>', null, 'DISMISS', false);
+console.log('[Q-LEDGER Console]: Classified Log exported to local system.');
+}
+window.exportJSON = exportJSON;
+
+/* INITIALIZATION */
+function renderAll(){
+renderTransactions();
+renderBudgetBox();
+renderGoals();
+saveState();
+}
+
+window.onload = function(){
+document.getElementById('fDate2').value = recentDate(0);
+renderAuth();
+window.renderAll = renderAll;
+window.openModal = openModal;
+window.hideModal = hideModal;
+window.showModal = showModal;
+}
+</script>
+</body>
+</html>
